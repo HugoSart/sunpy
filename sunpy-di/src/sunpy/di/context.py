@@ -34,7 +34,7 @@ class DIContext:
     def __init__(self):
         self._registry: dict[str, DIRegistryEntry] = {}
         self._ordered_registry: list[DIRegistryEntry] = []
-        self._singleton_instances: dict[Type, object] = {}
+        self._singleton_instances: dict[str, object] = {}
 
         from sunpy.di.factory import DIObjectFactory
         self._factory = DIObjectFactory(self)
@@ -50,7 +50,7 @@ class DIContext:
         covered_type = get_type_hints(clazz).get('return', None) if is_method else clazz
         entry = DIRegistryEntry(
             clazz=covered_type,
-            factory=clazz if is_method else clazz.__init__,
+            factory=clazz if is_method else clazz,
             scope=scope,
             name=actual_name,
             primary=primary,
@@ -115,18 +115,18 @@ class DIContext:
         return self.__instantiate_based_on_scope(entry, scope)
 
     def __instantiate_based_on_scope(self, entry: DIRegistryEntry, scope: DIScope | None = None) -> T:
-        clazz = entry.clazz
+        name = entry.name
         scope = scope or entry.scope
 
         # Singleton impl
         if scope == DIScope.SINGLETON:
-            if clazz not in self._singleton_instances:
-                self._singleton_instances[clazz] = self._factory.create(clazz)
-            return self._singleton_instances[clazz]
+            if name not in self._singleton_instances:
+                self._singleton_instances[name] = self._factory.create(entry.factory)
+            return self._singleton_instances[name]
 
         # Prototype impl
         if scope == DIScope.PROTOTYPE:
-            return self._factory.create(clazz)
+            return self._factory.create(entry.factory)
 
         # Unknown scope impl
         raise ValueError('Unknown scope')

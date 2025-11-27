@@ -1,5 +1,6 @@
 import inspect
-from typing import Type, TypeVar, Any
+from collections.abc import Callable
+from typing import Type, TypeVar, Any, cast
 
 from sunpy.di.context import DIContext
 
@@ -12,10 +13,10 @@ class DIObjectFactory:
     def __init__(self, context: DIContext) -> None:
         self._context = context
 
-    def create(self, clazz: Type[T]) -> T:
-        params = self.__real_params(clazz)
+    def create(self, clazz: Type[T] | Callable[[...], T]) -> T:
+        params = self.__real_params(clazz.__init__ if clazz is type else clazz)
         if len(params) == 0:
-            return clazz()
+            return cast(Callable[[], T], clazz)()
 
         # Positional args
         args = []
@@ -26,9 +27,9 @@ class DIObjectFactory:
         return clazz(*args, **kwargs)
 
     @staticmethod
-    def __real_params(clazz: Type[T]) -> list[tuple[str, Any]]:
-        sig = inspect.signature(clazz.__init__)
-        params = list(sig.parameters.values())[1:]  # remove self
+    def __real_params(factory: Callable[[...], T]) -> list[tuple[str, Any]]:
+        sig = inspect.signature(factory)
+        params = list(sig.parameters.values())  # remove self
         result = []
         for p in params:
             if p.kind in (p.POSITIONAL_OR_KEYWORD,):

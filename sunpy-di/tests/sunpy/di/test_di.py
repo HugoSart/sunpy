@@ -17,7 +17,7 @@ class _FuncDep:
     pass
 
 
-def dep() -> _FuncDep:
+def _dep() -> _FuncDep:
     return _FuncDep()
 
 
@@ -26,6 +26,11 @@ class _ComplexDep:
         self._dep_single = dep_single
         self._dep_list = dep_list
         self._dep_func = dep_func
+        self.value = 5
+
+
+def _complex_dep(dep: _ComplexDep) -> int:
+    return dep.value
 
 
 class _Config:
@@ -36,6 +41,9 @@ class _Config:
 
     @classmethod
     def class_dep(cls) -> _FuncDep:
+        return _FuncDep()
+
+    def instance_dep(self) -> _FuncDep:
         return _FuncDep()
 
 
@@ -55,7 +63,7 @@ def test_single_resolve_child_from_parent() -> None:
 
 def test_method() -> None:
     context = DIContext()
-    context.register(dep)
+    context.register(_dep)
     assert context.resolve(_FuncDep)
 
 
@@ -108,6 +116,18 @@ def test_complex_dep() -> None:
     assert isinstance(instance._dep_func, _FuncDep)
 
 
+def test_complex_dep_func() -> None:
+    context = DIContext()
+    context.register(_FuncDep)
+    context.register(_Dep)
+    context.register(_DepChild)
+    context.register(_DepOtherChild)
+    context.register(_ComplexDep)
+    context.register(_complex_dep)
+    instance = context.resolve(int)
+    assert instance == 5
+
+
 def test_static_method_dep() -> None:
     context = DIContext()
     context.register(_Config.static_dep)
@@ -118,5 +138,12 @@ def test_static_method_dep() -> None:
 def test_class_method_dep() -> None:
     context = DIContext()
     context.register(_Config.class_dep)
+    instance = context.resolve(_FuncDep)
+    assert instance
+
+
+def test_instance_method_dep() -> None:
+    context = DIContext()
+    context.register(_Config().instance_dep)
     instance = context.resolve(_FuncDep)
     assert instance
