@@ -71,7 +71,7 @@ class DIContext:
         try:
             return [entry for entry in self._ordered_registry if utils.is_assignable(entry.clazz, clazz)]
         except Exception:
-            print('Failed to find classes for type "%s"' % clazz.__name__)
+            print('Failed to find components for type "%s"' % clazz.__name__)
             raise
 
     def resolve(self, clazz: Type[T], scope: DIScope | None = None, name: str | None = None) -> T:
