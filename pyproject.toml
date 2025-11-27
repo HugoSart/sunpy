@@ -7,5 +7,14 @@ dependencies = [
     "sunpy-di",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
 [tool.uv.sources]
 sunpy-di = { path = "sunpy-di" }
+
+[tool.pytest.ini_options]
+pythonpath = ["sunpy-di/src"]
+testpaths = ["sunpy-di/tests"]

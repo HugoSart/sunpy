@@ -1,7 +1,6 @@
 import inspect
-from typing import Type, TypeVar, Any, get_origin, get_args
+from typing import Type, TypeVar, Any
 
-from sunpy.di import utils
 from sunpy.di.context import DIContext
 
 # Refs
@@ -22,8 +21,7 @@ class DIObjectFactory:
         args = []
         kwargs = {}
         for name, t in params:
-            arg = self._context.resolve_many(get_args(t)[0]) if get_origin(t) == list \
-                else self._context.resolve_single(t)
+            arg = self._context.resolve(t)
             kwargs[name] = arg
         return clazz(*args, **kwargs)
 
