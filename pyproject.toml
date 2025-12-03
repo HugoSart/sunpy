@@ -4,17 +4,19 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
-    "sunpy-di",
+    "sunpy-core",
 ]
 
 [dependency-groups]
 dev = [
     "pytest",
+    "ruff",
+    "ty",
 ]
 
 [tool.uv.sources]
-sunpy-di = { path = "sunpy-di" }
+sunpy-core = { path = "sunpy-core" }
 
 [tool.pytest.ini_options]
-pythonpath = ["sunpy-di/src"]
-testpaths = ["sunpy-di/tests"]
+pythonpath = ["sunpy-core/src"]
+testpaths = ["sunpy-core/tests"]

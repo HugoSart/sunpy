@@ -3,11 +3,16 @@ name = "sunpy-core"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+]
 
 [dependency-groups]
 dev = [
     "pytest",
+    "ruff",
+    "ty",
 ]
 
 [tool.pytest.ini_options]
